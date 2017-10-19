@@ -21,6 +21,17 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: go get -v -t -d ./...
-      - run: go build ./main.go
+
       # specify any bash command here prefixed with `run: `
+      - run: mkdir TEST_RESULTS
+      - run: go get github.com/jstemmer/go-junit-report
+      - run: go get -v -t -d ./...
+      - run: go test -v ./...
+      - run: wget -qO- https://cli-assets.heroku.com/install-ubuntu.sh | sh
+      - run: heroku login
+      - run: git remote add heroku git@heroku.com:habr-j7
+      - run: CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main
+      - run: docker build -t scratch -f Dockerfile .
+      - run: heroku plugins:install heroku-container-registry
+      - run: heroku container:login
+      - run: heroku container:push web

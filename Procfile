@@ -1,1 +1,1 @@
-web: habr-j7
+web: bash-j7
